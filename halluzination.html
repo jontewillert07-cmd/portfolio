@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Halluzination — Jonte Jesper Willert</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #080808;
+      --dark: #0e0e0e;
+      --mid: #1a1a1a;
+      --border: #222;
+      --gold: #c9a84c;
+      --gold-dim: #8a6f2e;
+      --white: #f0ece4;
+      --grey: #888;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--white); font-family: 'Space Mono', monospace; font-size: 13px; line-height: 1.7; cursor: none; }
+
+    .cursor { position: fixed; width: 6px; height: 6px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); }
+    .cursor-ring { position: fixed; width: 32px; height: 32px; border: 1px solid var(--gold-dim); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform .12s ease-out; }
+
+    /* Nav */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 24px 48px; background: linear-gradient(to bottom, rgba(8,8,8,.9), transparent); }
+    .nav-back { color: var(--grey); text-decoration: none; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; display: flex; align-items: center; gap: 12px; transition: color .3s; }
+    .nav-back:hover { color: var(--gold); }
+    .nav-back::before { content: '←'; }
+    .nav-logo { display:flex; align-items:center; text-decoration:none; } .nav-logo img { width:52px; height:52px; display:block; transition: width .4s, height .4s; } nav.scrolled .nav-logo img { width:36px; height:36px; }
+
+    /* Hero */
+    .project-hero { height: 100vh; position: relative; overflow: hidden; display: flex; align-items: flex-end; }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-image: url('Projekte/Paranoia/vlcsnap-2026-06-08-15h44m26s459.png');
+      background-size: cover;
+      background-position: center 30%;
+      filter: brightness(0.45) contrast(1.25) saturate(0.8);
+      transform: scale(1.05);
+      animation: zoomOut 12s ease-out forwards;
+    }
+    @keyframes zoomOut { from { transform: scale(1.1); } to { transform: scale(1.02); } }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--black) 0%, transparent 50%, rgba(8,8,8,.4) 100%); }
+    .hero-content { position: relative; z-index: 2; padding: 80px 48px; width: 100%; }
+    .hero-meta { display: flex; gap: 32px; margin-bottom: 24px; flex-wrap: wrap; }
+    .hero-meta-item { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); }
+    .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(64px, 10vw, 140px); font-weight: 300; line-height: 0.9; letter-spacing: -0.02em; margin-bottom: 8px; opacity: 0; animation: fadeUp .8s .3s forwards; }
+    .hero-subtitle { font-family: 'Cormorant Garamond', serif; font-size: clamp(24px, 4vw, 48px); font-weight: 300; font-style: italic; color: var(--gold); opacity: 0; animation: fadeUp .8s .5s forwards; margin-bottom: 32px; }
+    .hero-tagline { font-size: 12px; color: var(--grey); max-width: 480px; line-height: 1.9; opacity: 0; animation: fadeUp .8s .7s forwards; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Sections */
+    section { padding: 120px 48px; }
+    .section-label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 48px; display: flex; align-items: center; gap: 16px; }
+    .section-label::before { content: ''; display: block; width: 24px; height: 1px; background: var(--gold-dim); }
+
+    /* Synopsis */
+    #synopsis { border-bottom: 1px solid var(--border); }
+    .synopsis-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 80px; align-items: start; }
+    .synopsis-stats { display: flex; flex-direction: column; gap: 0; }
+    .stat-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
+    .stat-label { color: var(--grey); }
+    .stat-value { color: var(--white); text-align: right; }
+    .synopsis-text { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; line-height: 1.75; color: var(--white); }
+    .synopsis-text strong { color: var(--gold); font-weight: 400; }
+    .synopsis-text p + p { margin-top: 24px; }
+
+    /* Production Notes */
+    #production { background: var(--dark); }
+    .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 48px; }
+    .note-card { background: var(--dark); padding: 40px 32px; transition: background .3s; }
+    .note-card:hover { background: var(--mid); }
+    .note-num { font-size: 9px; color: var(--gold-dim); letter-spacing: 0.2em; margin-bottom: 16px; }
+    .note-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; margin-bottom: 12px; }
+    .note-text { font-size: 11px; color: var(--grey); line-height: 1.9; }
+    .note-text strong { color: var(--white); }
+
+    /* Gallery */
+    #gallery { padding: 120px 0; }
+    #gallery .section-label { padding: 0 48px; }
+    #gallery h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px,5vw,60px); font-weight: 300; padding: 0 48px; margin-bottom: 80px; }
+    #gallery h2 em { font-style: italic; color: var(--gold); }
+
+    .gallery-item { position: relative; overflow: hidden; cursor: none; aspect-ratio: 16/9; border-top: 1px solid var(--border); }
+    .gallery-item:last-child { border-bottom: 1px solid var(--border); }
+    .gallery-img { position: absolute; inset: 0; }
+    .gallery-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s cubic-bezier(.25,.46,.45,.94), filter .6s; filter: grayscale(15%); }
+    .gallery-item:hover .gallery-img img { transform: scale(1.03); filter: grayscale(0%); }
+    .gallery-item::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,8,.92) 0%, rgba(8,8,8,.4) 40%, transparent 70%); pointer-events: none; }
+    .gallery-overlay { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; padding: 40px 48px; display: flex; flex-direction: column; gap: 10px; }
+    .gallery-img-num { font-size: 9px; letter-spacing: 0.22em; color: var(--gold); }
+    .gallery-caption { font-family: 'Cormorant Garamond', serif; font-size: clamp(18px, 2.2vw, 26px); font-weight: 300; line-height: 1.3; color: var(--white); }
+    .gallery-caption strong { color: var(--gold); font-weight: 400; }
+    .gallery-cine { font-size: 11px; color: rgba(240,236,228,.65); line-height: 1.75; max-width: 680px; max-height: 0; overflow: hidden; transition: max-height .5s ease, opacity .4s; opacity: 0; }
+    .gallery-item:hover .gallery-cine { max-height: 200px; opacity: 1; }
+
+    /* Lightbox */
+    .lightbox { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.95); display: none; align-items: center; justify-content: center; flex-direction: column; gap: 24px; padding: 48px; }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 80vh; object-fit: contain; }
+    .lightbox-close { position: absolute; top: 32px; right: 48px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; cursor: none; background: none; border: none; color: var(--grey); transition: color .3s; }
+    .lightbox-close:hover { color: var(--gold); }
+    .lightbox-caption { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--grey); text-align: center; max-width: 600px; }
+
+    /* Footer */
+    .project-footer { border-top: 1px solid var(--border); padding: 64px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 32px; }
+    .footer-next { text-decoration: none; color: var(--white); }
+    .footer-next-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 8px; }
+    .footer-next-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; display: flex; align-items: center; gap: 16px; transition: gap .4s; }
+    .footer-next:hover .footer-next-title { gap: 24px; }
+    .footer-next-title em { font-style: italic; color: var(--gold); }
+    .footer-back { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); text-decoration: none; transition: color .3s; }
+    .footer-back:hover { color: var(--gold); }
+
+    @media (max-width: 900px) {
+      .synopsis-grid { grid-template-columns: 1fr; gap: 48px; }
+      .notes-grid { grid-template-columns: 1fr; }
+      nav { padding: 20px 24px; }
+      section { padding: 80px 24px; }
+    }
+
+    .note-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .note-tags span { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey); border: 1px solid var(--border); padding: 4px 8px; }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <nav>
+    <a href="index.html" class="nav-back">Alle Projekte</a>
+    <a href="index.html" class="nav-logo"><img src="logo-animated.svg" alt="JJW"/></a>
+  </nav>
+
+  <!-- Hero -->
+  <div class="project-hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-meta">
+        <span class="hero-meta-item">Kurzfilm</span>
+        <span class="hero-meta-item">Psycho-Thriller</span>
+        <span class="hero-meta-item">7 min 13 sec</span>
+        <span class="hero-meta-item">Sommer 2024</span>
+        <span class="hero-meta-item">Canon EOS M50 II · Sony Alpha 7C · DJI Drohne</span>
+      </div>
+      <h1 class="hero-title">Halluzination</h1>
+      <p class="hero-subtitle">„Ich will nicht sterben."</p>
+      <p class="hero-tagline">Regie · Kamera · Schnitt · Drehbuch · Produktion<br>Ein Psycho-Thriller über einen Polizisten auf der Jagd — und die Frage, wer der Jäger wirklich ist.</p>
+    </div>
+  </div>
+
+  <!-- Synopsis -->
+  <section id="synopsis">
+    <div class="section-label">Synopsis & Konzept</div>
+    <div class="synopsis-grid">
+      <div class="synopsis-stats">
+        <div class="stat-row"><span class="stat-label">Originaltitel</span><span class="stat-value">Halluzination</span></div>
+        <div class="stat-row"><span class="stat-label">Arbeitstitel</span><span class="stat-value">Paranoia</span></div>
+        <div class="stat-row"><span class="stat-label">Genre</span><span class="stat-value">Psycho-Thriller</span></div>
+        <div class="stat-row"><span class="stat-label">Laufzeit</span><span class="stat-value">7 min 13 sec</span></div>
+        <div class="stat-row"><span class="stat-label">Jahr</span><span class="stat-value">2024</span></div>
+        <div class="stat-row"><span class="stat-label">Drehtage</span><span class="stat-value">3</span></div>
+        <div class="stat-row"><span class="stat-label">Regie</span><span class="stat-value">Jonte Jesper Willert</span></div>
+        <div class="stat-row"><span class="stat-label">Kamera</span><span class="stat-value">Jonte Jesper Willert</span></div>
+        <div class="stat-row"><span class="stat-label">Schnitt</span><span class="stat-value">Jonte Jesper Willert</span></div>
+        <div class="stat-row"><span class="stat-label">Drehbuch</span><span class="stat-value">Jonte Jesper Willert · Freunde</span></div>
+        <div class="stat-row"><span class="stat-label">Schnitt & Color</span><span class="stat-value">DaVinci Resolve Studio</span></div>
+        <div class="stat-row"><span class="stat-label">Kamera A</span><span class="stat-value">Canon EOS M50 Mark II</span></div>
+        <div class="stat-row"><span class="stat-label">Kamera B</span><span class="stat-value">Sony Alpha 7C</span></div>
+        <div class="stat-row"><span class="stat-label">Kamera C</span><span class="stat-value">DJI Drohne (Luftaufnahmen)</span></div>
+        <div class="stat-row"><span class="stat-label">Objektive</span><span class="stat-value">Canon EF-M 22mm F2 · Sigma 16mm F1.4 DC DN · Sony FE 50mm F1.8 · Tamron 28–75mm F2.8 Di III</span></div>
+        <div class="stat-row"><span class="stat-label">Drehort</span><span class="stat-value">Altenholzer Stifter Wald · Psychiatrie-Innenraum</span></div>
+        <div class="stat-row" style="margin-top:16px;"><span class="stat-label" style="color:var(--gold);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">Besetzung</span><span class="stat-value"></span></div>
+        <div class="stat-row"><span class="stat-label">Protagonist</span><span class="stat-value">Jonte Jesper Willert</span></div>
+        <div class="stat-row"><span class="stat-label">Das Kind</span><span class="stat-value">Linnea Omlin</span></div>
+      </div>
+      <div class="synopsis-text">
+        <p>Ein Polizist jagt <strong>Nummer 11</strong> durch den Wald. Ein Kind taucht auf. Stirbt. Wieder und wieder. Die Bonbons in seiner Tasche — ein <strong>Tablettengeräusch</strong>.</p>
+        <p>Am Ende finden Psychiater den Leichnam. <em>Er war Nummer 11.</em></p>
+        <p style="font-style:italic; color:var(--gold); font-size:24px; margin-top:40px; line-height:1.2;">"Ich will nicht sterben."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Production Notes -->
+  <section id="production">
+    <div class="section-label">Produktion & Ästhetik</div>
+    <h2 style="font-family:'Cormorant Garamond',serif; font-size:clamp(36px,5vw,60px); font-weight:300; margin-bottom:0;">Wie der Film <em style="font-style:italic;color:var(--gold)">entstand.</em></h2>
+    <div class="notes-grid">
+      <div class="note-card">
+        <p class="note-num">01</p>
+        <h3 class="note-title">Konzept</h3>
+        <div class="note-tags"><span>Unzuverlässiger Erzähler</span><span>Schizophrenie</span><span>Psychose als Bild</span><span>Bonbons = Tabletten</span><span>Das Kind als Trauma</span></div>
+      </div>
+      <div class="note-card">
+        <p class="note-num">02</p>
+        <h3 class="note-title">Kamera</h3>
+        <div class="note-tags"><span>Canon EOS M50 Mark II</span><span>Sony Alpha 7C</span><span>DJI Drohne</span><span>Handkamera</span><span>Overhead-Shot</span></div>
+      </div>
+      <div class="note-card">
+        <p class="note-num">03</p>
+        <h3 class="note-title">Licht</h3>
+        <div class="note-tags"><span>Natürliches Tageslicht</span><span>Notausgangsschild</span><span>Kein künstliches Licht</span></div>
+      </div>
+      <div class="note-card">
+        <p class="note-num">04</p>
+        <h3 class="note-title">Drehbuch</h3>
+        <div class="note-tags"><span>Mit Freunden geschrieben</span><span>Wiederholung als Mittel</span><span>Tablettengeräusch</span><span>Unreliable Narrator</span></div>
+      </div>
+      <div class="note-card">
+        <p class="note-num">05</p>
+        <h3 class="note-title">Schnitt</h3>
+        <div class="note-tags"><span>DaVinci Resolve Studio</span><span>Harte Schnitte</span><span>Baum-Wipe</span><span>Bonbon–Tabletten-Glitch</span></div>
+      </div>
+      <div class="note-card">
+        <p class="note-num">06</p>
+        <h3 class="note-title">Set & Cast</h3>
+        <div class="note-tags"><span>Altenholzer Stifter Wald</span><span>3 Drehtage</span><span>Protagonist: Jonte Jesper Willert</span><span>Kind: Linnea Omlin</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <section id="gallery">
+    <div class="section-label">Filmstills & Cinematographie</div>
+    <h2>Bild für Bild — <em>jede Entscheidung hat einen Grund.</em></h2>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Paranoia/vlcsnap-2026-06-08-13h44m57s876.png" alt="Still 01" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 01 / 11 · Drohnenshot — Protagonist im Wald</span>
+        <p class="gallery-caption">Overhead. Protagonist liegt auf dem Waldboden. Figuren am Rand des Frames.</p>
+        <p class="gallery-cine">Drohne senkrecht nach unten. Der Protagonist als Punkt im Grün — umgeben von dem, was er sich einbildet. Dieselbe Einstellung markiert den Übergang zwischen Realität und Psychose: von hier aus fliegt die Drohne hoch, bis nur noch Wald zu sehen ist, dann runter — und plötzlich trägt das Polizeiteam Militärkleidung.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Paranoia/vlcsnap-2026-06-08-15h41m41s845.png" alt="Still 02" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 02 / 11 · Verfolgung — Protagonist flieht oder jagt</span>
+        <p class="gallery-caption">Protagonist in Bewegung. Figuren im Rücken, Wald verwischt.</p>
+        <p class="gallery-cine">Handkamera mit Bewegungsunschärfe im Hintergrund — die Figuren hinter ihm sind scharf genug um wahrgenommen zu werden, unscharf genug um unklar zu bleiben: Polizisten oder Einbildung? Die schwarze Lederjacke als einziges konstantes Erkennungsmerkmal des Protagonisten durch den gesamten Film.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Paranoia/vlcsnap-2026-06-08-15h41m46s918.png" alt="Still 03" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 03 / 11 · Eskalation — Protagonist mit Pistole</span>
+        <p class="gallery-caption">Protagonist läuft. Pistole in der Hand. Figuren links und rechts.</p>
+        <p class="gallery-cine">Weite Einstellung, Handkamera — kein Stativ. Die Pistole ist sichtbar, aber der Fokus liegt auf dem Gesicht: Panik, kein Plan. Die Figuren im Bild sind Teil der Szene oder Teil der Psychose — der Schnitt gibt erst später Auskunft. Natürliches Gegenlicht durch das Blätterdach.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Paranoia/vlcsnap-2026-06-08-15h41m50s031.png" alt="Still 04" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 04 / 11 · Innenwelt — Seitenprofil, fokussierter Blick</span>
+        <p class="gallery-caption">Protagonist im Profil. Figuren auf offener Blende weggezoomt.</p>
+        <p class="gallery-cine">Langer Brennweite-Einsatz: Die unscharfen Figuren im Rücken sind bewusst nicht identifizierbar. Seitenprofil statt Frontal — der Protagonist schaut nicht zur Kamera, sondern in eine Richtung, die der Zuschauer nicht sieht. Natürliches Seitenlicht durch das Baumlaub.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Paranoia/vlcsnap-2026-06-08-15h42m27s275.png" alt="Still 05" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 05 / 11 · Behind the Scenes — DJI Drohne im Einsatz</span>
+        <p class="gallery-caption">DJI Drohne zwischen Baumwipfeln. Produktionsdokument.</p>
+        <p class="gallery-cine">Das Werkzeug selbst als Bild. Die Drohne ermöglicht die Overhead-Shots, die dramaturgisch die Übergänge zwischen Bewusstseinsebenen markieren — von subjektiver Bodenkamera zur allwissenden Vogelperspektive, die zeigt, was der Protagonist nicht sieht: dass er allein ist.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Paranoia/vlcsnap-2026-06-08-15h42m31s950.png" alt="Still 06" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 06 / 11 · Subjektive — Baumwipfel von unten</span>
+        <p class="gallery-caption">Kamera auf dem Boden, Weitwinkel, Bäume in alle Richtungen.</p>
+        <p class="gallery-cine">Extremer Untersicht, Weitwinkel — die Bäume als Käfig. Diese Perspektive entspricht dem Moment, in dem der Protagonist am Boden liegt oder die Kontrolle verliert. Der blaue Himmel in der Mitte: der einzige Ausweg, unerreichbar. Kein künstliches Licht — ausschließlich natürliches Gegenlicht.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Paranoia/vlcsnap-2026-06-08-15h43m16s163.png" alt="Still 07" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 07 / 11 · Konfrontation — Pistole in die Kamera</span>
+        <p class="gallery-caption">POV-Shot. Pistole direkt auf den Zuschauer gerichtet. Schütze im Hintergrund.</p>
+        <p class="gallery-cine">Die Kamera als Auge des Protagonisten — oder des Opfers. Der Schütze ist unscharf, die Waffe scharf: die Einstellung macht den Zuschauer zum Ziel. Natürliches Gegenlicht aus dem Wald hinter dem Schützen sorgt für Silhouettierung. Wer zielt, ist dieser Einstellung nicht eindeutig zu entnehmen.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Paranoia/vlcsnap-2026-06-08-15h44m04s775.png" alt="Still 08" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 08 / 11 · Ende — Protagonist auf dem Waldboden</span>
+        <p class="gallery-caption">Vogelperspektive. Protagonist liegt auf Herbstlaub. Pistole neben ihm.</p>
+        <p class="gallery-cine">Overhead-Shot von oben — Drohne oder erhöhte Position. Der Protagonist liegt in der Mitte des Frames, symmetrisch, die Pistole am Rand. Die Herbstblätter als Teppich erden die Szene: kein Kunstblut, kein Make-up-Tod, nur ein Körper auf dem Boden des Waldes, den er gesucht hat. Psychiater finden ihn hier.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Paranoia/vlcsnap-2026-06-08-15h44m13s283.png" alt="Still 09" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 09 / 11 · Das Kind — direkter Blickkontakt</span>
+        <p class="gallery-caption">Das Kind schaut direkt in die Kamera. Wald im Hintergrund.</p>
+        <p class="gallery-cine">Das einzige Mal, dass eine Figur direkt in die Kamera schaut — und damit direkt den Zuschauer ansieht. Das Kind bricht die vierte Wand dort, wo der Protagonist es nicht tut. Natürliches Licht, Herbstlaub auf dem Boden: die Jahreszeit ist anders als die Waldszenen mit dem Protagonisten — eine weitere Dissonanz, die auf das Eingebildete hinweist.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Paranoia/vlcsnap-2026-06-08-15h44m26s459.png" alt="Still 10" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 10 / 11 · Zusammenbruch — Pistole an der Schläfe</span>
+        <p class="gallery-caption">Protagonist. Blut im Gesicht. Pistole an die eigene Schläfe gehalten.</p>
+        <p class="gallery-cine">Der Moment des totalen Zusammenbruchs. Grüner Teal-Tint im Hintergrund — derselbe Farbton wie die Psychiatrie-Innenräume, mitten im Wald. Das Blut im Gesicht: Make-up oder Kampf. Die Pistole richtet sich gegen ihn selbst: Jäger und Gejagter sind dieselbe Person.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Paranoia/vlcsnap-2026-06-08-15h44m47s225.png" alt="Still 11" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 11 / 11 · Psychiatrie — Notausgangsschild</span>
+        <p class="gallery-caption">Notausgangsschild. Dunkel. Grünes Licht als einzige Lichtquelle.</p>
+        <p class="gallery-cine">Das Notausgangsschild als Practical Light — kein Panel, kein Gel. Dasselbe Prinzip wie in Berry Tea, andere Umgebung: die Psychiatrie-Innenräume werden ausschließlich durch dieses Schild beleuchtet. Der grüne Stich ist kein Color Grading, sondern das Licht, das tatsächlich da war. Der Ausweg ist ausgeschildert — aber der Protagonist findet ihn nicht.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div class="project-footer">
+    <a href="index.html" class="footer-back">← Zurück zur Übersicht</a>
+    <a href="berry-tea.html" class="footer-next">
+      <p class="footer-next-label">Weiteres Projekt</p>
+      <p class="footer-next-title">Berry Tea <em>→</em></p>
+    </a>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">Schließen ✕</button>
+    <img id="lightboxImg" src="" alt="" />
+    <p class="lightbox-caption" id="lightboxCaption"></p>
+  </div>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let ringX = 0, ringY = 0, curX = 0, curY = 0;
+    document.addEventListener('mousemove', e => {
+      curX = e.clientX; curY = e.clientY;
+      cursor.style.left = curX + 'px'; cursor.style.top = curY + 'px';
+    });
+    function animateRing() {
+      ringX += (curX - ringX) * 0.12; ringY += (curY - ringY) * 0.12;
+      ring.style.left = ringX + 'px'; ring.style.top = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    document.querySelectorAll('.gallery-img').forEach(el => {
+      el.addEventListener('click', () => {
+        const img = el.querySelector('img');
+        const caption = el.closest('.gallery-item').querySelector('.gallery-caption').textContent;
+        lightboxImg.src = img.src;
+        lightboxCaption.textContent = caption;
+        lightbox.classList.add('open');
+      });
+    });
+    document.getElementById('lightboxClose').addEventListener('click', () => lightbox.classList.remove('open'));
+    lightbox.addEventListener('click', e => { if(e.target === lightbox) lightbox.classList.remove('open'); });
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') lightbox.classList.remove('open'); });
+
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; } });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.gallery-item, .note-card').forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(32px)';
+      el.style.transition = 'opacity .7s, transform .7s';
+      obs.observe(el);
+    });
+  </script>
+</body>
+</html>

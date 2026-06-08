@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <!-- Main flare gradient - horizontal -->
+    <radialGradient id="rMain" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.95"/>
+      <stop offset="28%" stop-color="#c9a84c" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Side flare gradients -->
+    <radialGradient id="rSideL" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="rSideR" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Soft glow behind elements only -->
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/></feMerge>
+    </filter>
+    <filter id="coreGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
+      <feMerge><feMergeNode in="blur"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- === GLOW LAYER (blurry, behind everything) === -->
+  <!-- Flare glow bg -->
+  <ellipse cx="200" cy="200" rx="190" ry="16" fill="#c9a84c" opacity="0.07" filter="url(#softGlow)"/>
+  <!-- Core glow bg -->
+  <circle cx="200" cy="200" r="18" fill="#c9a84c" filter="url(#coreGlow)">
+    <animate attributeName="opacity" values="0.5;0.9;0.4;0.8;0.5" dur="2.4s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- === CRISP ELEMENTS (no blur) === -->
+
+  <!-- Main horizontal flare — breathes -->
+  <ellipse cx="200" cy="200" rx="192" ry="14" fill="url(#rMain)">
+    <animate attributeName="opacity" values="0.22;0.38;0.17;0.32;0.22" dur="3.8s" repeatCount="indefinite"/>
+    <animate attributeName="ry" values="14;19;12;17;14" dur="3.8s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- Secondary flare left -->
+  <ellipse cx="108" cy="200" rx="72" ry="9" fill="url(#rSideL)">
+    <animate attributeName="opacity" values="0.28;0.1;0.42;0.15;0.28" dur="2.9s" repeatCount="indefinite"/>
+    <animate attributeName="rx" values="72;88;58;80;72" dur="2.9s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- Secondary flare right -->
+  <ellipse cx="298" cy="200" rx="72" ry="9" fill="url(#rSideR)">
+    <animate attributeName="opacity" values="0.28;0.44;0.12;0.36;0.28" dur="3.3s" repeatCount="indefinite"/>
+    <animate attributeName="rx" values="72;58;90;66;72" dur="3.3s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- Outer ring — crisp, slow pulse -->
+  <circle cx="200" cy="200" r="52" fill="none" stroke="#c9a84c" stroke-width="1">
+    <animate attributeName="opacity" values="0.28;0.55;0.18;0.45;0.28" dur="4.2s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="52;58;48;55;52" dur="4.2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Main circle ring — crisp -->
+  <circle cx="200" cy="200" r="33" fill="none" stroke="#c9a84c" stroke-width="2.2">
+    <animate attributeName="opacity" values="0.85;1;0.7;0.95;0.85" dur="3.1s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Inner ring — crisp -->
+  <circle cx="200" cy="200" r="22" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.4">
+    <animate attributeName="opacity" values="0.4;0.7;0.25;0.55;0.4" dur="3.6s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Center dot — crisp, heartbeat -->
+  <circle cx="200" cy="200" r="10" fill="#c9a84c">
+    <animate attributeName="r" values="10;15;8;13;10" dur="2.4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0.85;1;0.9;1" dur="2.4s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- JJW Text — crisp -->
+  <text x="200" y="315"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="52"
+    font-weight="300"
+    fill="#c9a84c"
+    text-anchor="middle"
+    letter-spacing="16">
+    JJW
+    <animate attributeName="opacity" values="0.85;1;0.75;0.95;0.85" dur="3.8s" repeatCount="indefinite"/>
+  </text>
+</svg>

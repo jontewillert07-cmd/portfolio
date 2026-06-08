@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Berry Tea / Transposons — Jonte Jesper Willert</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #080808;
+      --dark: #0e0e0e;
+      --mid: #1a1a1a;
+      --border: #222;
+      --gold: #c9a84c;
+      --gold-dim: #8a6f2e;
+      --white: #f0ece4;
+      --grey: #888;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--white); font-family: 'Space Mono', monospace; font-size: 13px; line-height: 1.7; cursor: none; }
+
+    .cursor { position: fixed; width: 6px; height: 6px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); }
+    .cursor-ring { position: fixed; width: 32px; height: 32px; border: 1px solid var(--gold-dim); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform .12s ease-out; }
+
+    /* Nav */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 24px 48px; background: linear-gradient(to bottom, rgba(8,8,8,.9), transparent); }
+    .nav-back { color: var(--grey); text-decoration: none; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; display: flex; align-items: center; gap: 12px; transition: color .3s; }
+    .nav-back:hover { color: var(--gold); }
+    .nav-back::before { content: '←'; }
+    .nav-logo { display:flex; align-items:center; text-decoration:none; } .nav-logo img { width:52px; height:52px; display:block; transition: width .4s, height .4s; } nav.scrolled .nav-logo img { width:36px; height:36px; }
+
+    /* Hero */
+    .project-hero {
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-image: url('Projekte/Berry Tea/berrytea16.png');
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.5) contrast(1.2);
+      transform: scale(1.05);
+      animation: zoomOut 12s ease-out forwards;
+    }
+    @keyframes zoomOut { from { transform: scale(1.1); } to { transform: scale(1.02); } }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--black) 0%, transparent 50%, rgba(8,8,8,.3) 100%); }
+    .hero-content { position: relative; z-index: 2; padding: 80px 48px; width: 100%; }
+    .hero-meta { display: flex; gap: 32px; margin-bottom: 24px; }
+    .hero-meta-item { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); }
+    .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(64px, 10vw, 140px); font-weight: 300; line-height: 0.9; letter-spacing: -0.02em; margin-bottom: 8px; opacity: 0; animation: fadeUp .8s .3s forwards; }
+    .hero-subtitle { font-family: 'Cormorant Garamond', serif; font-size: clamp(24px, 4vw, 48px); font-weight: 300; font-style: italic; color: var(--gold); opacity: 0; animation: fadeUp .8s .5s forwards; margin-bottom: 32px; }
+    .hero-tagline { font-size: 12px; color: var(--grey); max-width: 480px; line-height: 1.9; opacity: 0; animation: fadeUp .8s .7s forwards; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Sections */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
+    section { padding: 120px 48px; }
+    .section-label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 48px; display: flex; align-items: center; gap: 16px; }
+    .section-label::before { content: ''; display: block; width: 24px; height: 1px; background: var(--gold-dim); }
+
+    /* Synopsis */
+    #synopsis { border-bottom: 1px solid var(--border); }
+    .synopsis-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 80px; align-items: start; }
+    .synopsis-stats { display: flex; flex-direction: column; gap: 0; }
+    .stat-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
+    .stat-label { color: var(--grey); }
+    .stat-value { color: var(--white); text-align: right; }
+    .synopsis-text { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; line-height: 1.75; color: var(--white); }
+    .synopsis-text strong { color: var(--gold); font-weight: 400; }
+    .synopsis-text p + p { margin-top: 24px; }
+
+    /* Production Notes */
+    #production { background: var(--dark); }
+    .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 48px; }
+    .note-card { background: var(--dark); padding: 40px 32px; }
+    .note-card:hover { background: var(--mid); }
+    .note-num { font-size: 9px; color: var(--gold-dim); letter-spacing: 0.2em; margin-bottom: 16px; }
+    .note-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; margin-bottom: 12px; }
+    .note-text { font-size: 11px; color: var(--grey); line-height: 1.9; }
+    .note-text strong { color: var(--white); }
+
+    /* Gallery */
+    #gallery { padding: 120px 0; }
+    #gallery .section-label { padding: 0 48px; }
+    #gallery h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px,5vw,60px); font-weight: 300; padding: 0 48px; margin-bottom: 80px; }
+    #gallery h2 em { font-style: italic; color: var(--gold); }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+      aspect-ratio: 16/9;
+      border-top: 1px solid var(--border);
+    }
+    .gallery-item:last-child { border-bottom: 1px solid var(--border); }
+
+    .gallery-img {
+      position: absolute; inset: 0;
+    }
+    .gallery-img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 1s cubic-bezier(.25,.46,.45,.94), filter .6s;
+      filter: grayscale(15%);
+    }
+    .gallery-item:hover .gallery-img img { transform: scale(1.03); filter: grayscale(0%); }
+
+    /* Gradient overlay — always visible at bottom */
+    .gallery-item::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(8,8,8,.92) 0%, rgba(8,8,8,.4) 40%, transparent 70%);
+      pointer-events: none;
+      transition: opacity .4s;
+    }
+
+    .gallery-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      z-index: 2;
+      padding: 40px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .gallery-img-num {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      color: var(--gold);
+    }
+
+    .gallery-caption {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(18px, 2.2vw, 26px);
+      font-weight: 300;
+      line-height: 1.3;
+      color: var(--white);
+    }
+    .gallery-caption strong { color: var(--gold); font-weight: 400; }
+
+    .gallery-cine {
+      font-size: 11px;
+      color: rgba(240,236,228,.65);
+      line-height: 1.75;
+      max-width: 680px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .5s ease, opacity .4s;
+      opacity: 0;
+    }
+    .gallery-item:hover .gallery-cine {
+      max-height: 200px;
+      opacity: 1;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 24px;
+      padding: 48px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 80vh; object-fit: contain; }
+    .lightbox-close {
+      position: absolute; top: 32px; right: 48px;
+      font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--grey); cursor: none;
+      background: none; border: none; color: var(--grey);
+      transition: color .3s;
+    }
+    .lightbox-close:hover { color: var(--gold); }
+    .lightbox-caption { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--grey); text-align: center; max-width: 600px; }
+
+    /* Footer */
+    .project-footer { border-top: 1px solid var(--border); padding: 64px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 32px; }
+    .footer-next { text-decoration: none; color: var(--white); }
+    .footer-next-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 8px; }
+    .footer-next-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; display: flex; align-items: center; gap: 16px; transition: gap .4s; }
+    .footer-next:hover .footer-next-title { gap: 24px; }
+    .footer-next-title em { font-style: italic; color: var(--gold); }
+    .footer-back { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); text-decoration: none; transition: color .3s; }
+    .footer-back:hover { color: var(--gold); }
+
+    @media (max-width: 900px) {
+
+
+
+      .synopsis-grid { grid-template-columns: 1fr; gap: 48px; }
+      .notes-grid { grid-template-columns: 1fr; }
+      nav { padding: 20px 24px; }
+      section { padding: 80px 24px; }
+    }
+
+    /* Cast Grid */
+    .cast-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 4px; }
+    .cast-item { display: flex; flex-direction: column; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .cast-role { font-size: 9px; color: var(--grey); letter-spacing: 0.1em; }
+    .cast-name { font-size: 11px; color: var(--white); margin-top: 2px; }
+
+    .note-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .note-tags span { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey); border: 1px solid var(--border); padding: 4px 8px; }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <nav>
+    <a href="index.html" class="nav-back">Alle Projekte</a>
+    <a href="index.html" class="nav-logo"><img src="logo-animated.svg" alt="JJW"/></a>
+  </nav>
+
+  <!-- Hero -->
+  <div class="project-hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-meta">
+        <span class="hero-meta-item">Kurzfilm</span>
+        <span class="hero-meta-item">Science Fiction</span>
+        <span class="hero-meta-item">12 min 21 sec</span>
+        <span class="hero-meta-item">Drehtage: 10.–18.01.2026</span>
+        <span class="hero-meta-item">Sony Alpha 7</span>
+      </div>
+      <h1 class="hero-title">Berry Tea</h1>
+      <p class="hero-subtitle">„Transposons"</p>
+      <p class="hero-tagline">Regie · Kamera · Schnitt · Licht · Drehbuch · Produktion<br>Ein Science-Fiction-Kurzfilm über springende Gene, außerirdisches Leben — und eine Tasse Tee, die alles verändert.</p>
+    </div>
+  </div>
+
+  <!-- Synopsis -->
+  <section id="synopsis">
+    <div class="section-label">Synopsis & Konzept</div>
+    <div class="synopsis-grid">
+      <div class="synopsis-stats">
+        <div class="stat-row"><span class="stat-label">Originaltitel</span><span class="stat-value">Transposons</span></div>
+        <div class="stat-row"><span class="stat-label">Genre</span><span class="stat-value">Sci-Fi Thriller</span></div>
+        <div class="stat-row"><span class="stat-label">Laufzeit</span><span class="stat-value">12 min 21 sec</span></div>
+        <div class="stat-row"><span class="stat-label">Drehtage</span><span class="stat-value">10.–18.01.2026</span></div>
+        <div class="stat-row"><span class="stat-label">Regie · Kamera · Schnitt</span><span class="stat-value">Jonte Jesper Willert</span></div>
+        <div class="stat-row"><span class="stat-label">2nd AC</span><span class="stat-value">Linnea Omlin</span></div>
+        <div class="stat-row"><span class="stat-label">Ton</span><span class="stat-value">Jytte Jesine Willert</span></div>
+        <div class="stat-row"><span class="stat-label">Kamera</span><span class="stat-value">Sony Alpha 7 · Canon EOS M50</span></div>
+        <div class="stat-row"><span class="stat-label">Lichter</span><span class="stat-value">Amaran 300c · Smallrig 120d</span></div>
+        <div class="stat-row"><span class="stat-label">Schnitt & Color</span><span class="stat-value">DaVinci Resolve Studio</span></div>
+        <div class="stat-row"><span class="stat-label">Drehort</span><span class="stat-value">Gemeinschaftsschule Friedrichsort</span></div>
+        <div class="stat-row"><span class="stat-label">Musik</span><span class="stat-value">Ronald Kah</span></div>
+        <p class="stat-label" style="margin-top:24px;margin-bottom:10px;">Besetzung</p>
+        <div class="cast-grid">
+          <div class="cast-item"><span class="cast-role">Tea Lady</span><span class="cast-name">Jytte Jesine Willert</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Connor</span><span class="cast-name">Rebecca Weller</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Roberts</span><span class="cast-name">Linnea Omlin</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. McCaffrey</span><span class="cast-name">Matthias Behrens</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Brando</span><span class="cast-name">Kjell Schweder</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Preston</span><span class="cast-name">Nicolai Abshagen</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Mallark</span><span class="cast-name">Dieter Glanz</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Schroeter</span><span class="cast-name">Jule Schroeter</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Higgins</span><span class="cast-name">Lorenz Abshagen</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Lindgren</span><span class="cast-name">Göran Svante Willert</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Standford</span><span class="cast-name">Niklas Kraus</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Malcolm</span><span class="cast-name">Lars Willert</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Nolan</span><span class="cast-name">Ann-Christin Urbarz</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Charles</span><span class="cast-name">Birgit Schroeter</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Meyer</span><span class="cast-name">Hans Joachim Sprenger</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Darwik</span><span class="cast-name">Domenique Feucht</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Abston</span><span class="cast-name">Yvonne Willert-Sprenger</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Miller</span><span class="cast-name">Ben Albrecht</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Skarkov</span><span class="cast-name">Barbara Sprenger</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Michigan</span><span class="cast-name">Reinhild Glanz</span></div>
+          <div class="cast-item"><span class="cast-role">Dr. Fischer</span><span class="cast-name">Anastasia Krämer</span></div>
+          <div class="cast-item"><span class="cast-role">Evacuation Officer</span><span class="cast-name">Georg Schroeter · Jonte Willert</span></div>
+        </div>
+      </div>
+      <div class="synopsis-text">
+        <p><strong>Transposons</strong> — springende Gene. Ein Rover bringt sie zur Erde. Ein Wissenschaftler atmet sie ein. Stirbt. Der Boss trinkt seinen Tee. Öffnet die Augen. Sie sind <strong>weiß</strong>.</p>
+        <p style="font-style:italic; color:var(--gold); font-size:24px; margin-top:40px; line-height:1.2;">"We are brilliant."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Production Notes -->
+  <section id="production">
+    <div class="section-label">Produktion & Ästhetik</div>
+    <h2 style="font-family:'Cormorant Garamond',serif; font-size:clamp(36px,5vw,60px); font-weight:300; margin-bottom:0;">Wie der Film <em style="font-style:italic;color:var(--gold)">entstand.</em></h2>
+    <div class="notes-grid">
+      <div class="note-card">
+        <p class="note-num">01</p>
+        <h3 class="note-title">Licht</h3>
+        <div class="note-tags"><span>Amaran 300c</span><span>Smallrig 120d</span><span>Softbox</span><span>Diffuser</span><span>Rembrandt Lighting</span><span>Teal · Rot</span><span>Lebensmittelfarbe</span></div>
+      </div>
+      <div class="note-card">
+        <p class="note-num">02</p>
+        <h3 class="note-title">Kamera</h3>
+        <div class="note-tags"><span>Sony Alpha 7</span><span>Sony FE 24–70mm F2.8</span><span>Canon EF-M 22mm F2</span><span>Makro</span><span>Offene Blende</span><span>Handkamera</span></div>
+      </div>
+      <div class="note-card">
+        <p class="note-num">03</p>
+        <h3 class="note-title">Practical Effects</h3>
+        <div class="note-tags"><span>Nachts draußen</span><span>Echter Schnee</span><span>Nebelmaschine</span><span>Silvester-Böller</span><span>Rover: Alufolie · Holz · Klorollen</span><span>Durchsichtige Schnüre</span><span>Kontaktlinsen</span><span>Kein CGI</span></div>
+      </div>
+      <div class="note-card">
+        <p class="note-num">04</p>
+        <h3 class="note-title">Postproduktion</h3>
+        <div class="note-tags"><span>DaVinci Resolve Studio</span><span>Color Grading</span><span>Teal — Labor</span><span>Rot — Planet</span></div>
+      </div>
+      <div class="note-card">
+        <p class="note-num">05</p>
+        <h3 class="note-title">Konzept</h3>
+        <div class="note-tags"><span>Transposons — echte Wissenschaft</span><span>Sci-Fi Thriller</span><span>Eigenproduktion</span><span>Berry Tea — das harmloseste Objekt</span></div>
+      </div>
+      <div class="note-card">
+        <p class="note-num">06</p>
+        <h3 class="note-title">Set & Crew</h3>
+        <div class="note-tags"><span>Gemeinschaftsschule Friedrichsort</span><span>23 Darsteller</span><span>9 Drehtage</span><span>Musik: Ronald Kah</span><span>Ton: DJI Mic 2</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <section id="gallery">
+    <div class="section-label">Filmstills & Cinematographie</div>
+    <h2>Bild für Bild — <em>jede Entscheidung hat einen Grund.</em></h2>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea1.png" alt="Still 01" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 01 / 17 · Szene 13 — Mutation</span>
+        <p class="gallery-caption">Weiße Kontaktlinsen. FFP2-Maske. Extreme Close-Up.</p>
+        <p class="gallery-cine"><strong>Amaran 300c</strong> mit Softbox, kein Fill — bewusstes <strong>Rembrandt Lighting</strong>: hartes Seitenlicht von oben, das die weißen Augen im dunklen Gesicht isoliert. Ausschnitt so eng gewählt, dass kein Kontext bleibt — nur die Augen wirken.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea2.png" alt="Still 02" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 02 / 17 · Szene 2 — Space Central</span>
+        <p class="gallery-caption">Schauspielerin Rebecca Weller. Kollege auf f/2.8 in Unschärfe dahinter.</p>
+        <p class="gallery-cine">Monitorglow als Basis, <strong>Amaran 300c</strong> mit Teal-Einstellung als Key — <strong>Rembrandt Lighting</strong>: seitlich von oben, kein Fill. Sony FE 24–70mm bei 70mm, offene Blende. Tiefenschärfe als Hierarchie statt Schnitt: wer scharf ist, ist wichtig.</p>
+      </div>
+    </div>
+
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea4.png" alt="Still 04" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 03 / 17 · Szene 9 — Labor</span>
+        <p class="gallery-caption">Zwei Wissenschaftler. Leuchtender Reaktionskolben als einziger Lichtgeber.</p>
+        <p class="gallery-cine">Bunsenbrenner und LEDs als Practical Lights, dazu <strong>Amaran 300c</strong> und <strong>Smallrig 120d</strong> für kontrollierten Farbstich. Die Flüssigkeit im Kolben: mit Lebensmittelfarbe eingefärbt. Kamera aus Hüfthöhe — die Arbeit im Vordergrund, alles andere dunkel.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea5.png" alt="Still 05" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 04 / 17 · Szene 2 — Space Central</span>
+        <p class="gallery-caption">Insert: selbst gestaltetes Rover-Interface. „United Space"-Logo als Aufkleber auf dem Monitor.</p>
+        <p class="gallery-cine">UI in Figma entworfen, als Vollbild auf echtem Monitor. Teal-Stich kommt direkt vom Bildschirm — kein Gel, kein Panel. Wissenschaftlerin nur als Silhouette im Rücken, damit der Monitor das einzige Informationszentrum im Frame ist.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea6.png" alt="Still 06" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 05 / 17 · Szene 9 — Labor</span>
+        <p class="gallery-caption">Kamera durch Laborgeräte hindurch. Environmental Framing.</p>
+        <p class="gallery-cine">Reagenzgläser manuell als Vordergrundrahmen in die Unschärfe gestellt. <strong>Amaran 300c</strong> mit Diffuser für den Teal-Stich. Der Winkel gibt dem Zuschauer das Gefühl, durch das Equipment hindurch zu beobachten — nicht omniszient, sondern eingeschränkt.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea7.png" alt="Still 07" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 06 / 17 · Szene 9 — Labor</span>
+        <p class="gallery-caption">Wissenschaftler hält Kolben gegen Licht. Mikroskop als Vordergrundrahmen.</p>
+        <p class="gallery-cine">Mikroskop manuell unscharf im Vordergrund. <strong>Amaran 300c</strong> und <strong>Smallrig 120d</strong> im Einsatz, dazu der Bunsenbrenner als Practical Light. Leicht untersichtige Kameraposition. Das warme Unterlicht ist der einzige konsequent warme Ton im gesamten Film.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea8.png" alt="Still 08" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 07 / 17 · Szene 9 — Labor</span>
+        <p class="gallery-caption">Seitenprofil am Mikroskop. Licht ausschließlich vom Monitor dahinter.</p>
+        <p class="gallery-cine">Monitor als Practical Light, dazu <strong>Amaran 300c</strong> und <strong>Smallrig 120d</strong> für den Teal-Stich. 70mm, offene Blende — Hintergrund komplett weggezoomt. Gewartet auf den Moment, in dem die Konzentration im Gesicht ablesbar ist, ohne Blickkontakt zur Kamera.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea9.png" alt="Still 09" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 08 / 17 · Szene 9 — Labor</span>
+        <p class="gallery-caption">Makro: Latexhandschuh schreibt auf Papier. Kein Gesicht, kein Kontext.</p>
+        <p class="gallery-cine"><strong>Amaran 300c</strong> und <strong>Smallrig 120d</strong> als Lichtquellen. Kein Gesicht im Frame — die Handlung selbst ist das Sujet. Latexstruktur und Tinte als einzige Bildinformation.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea3.png" alt="Still 03" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 09 / 17 · Szene 13 — Mutation</span>
+        <p class="gallery-caption">3/4-Profil. Blaues Gegenlicht durch Fenster, Gesicht im Schatten.</p>
+        <p class="gallery-cine"><strong>Amaran 300c</strong> als Key Light, bewusst als <strong>Rembrandt Lighting</strong> eingesetzt: Licht von oben seitlich, kein Fill — das typische Dreieck auf der Wangenseite. Diese Lichtsetzung zieht sich durch alle Gesichts-Shots im Film. Der 3/4-Winkel statt Frontal: die Augen zeigen sich, ohne direkt zurückzublicken.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea10.png" alt="Still 10" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 10 / 17 · Szene 10 — Hitze-Experiment</span>
+        <p class="gallery-caption">Rotes Reagenzglas über Bunsenbrenner. Flamme als primärer Lichtgeber.</p>
+        <p class="gallery-cine">Bunsenbrenner-Flamme beleuchtet die rote Flüssigkeit von unten — kein weiteres Licht. Hand absichtlich angeschnitten: Fokus auf das Objekt, nicht den Menschen. Bokeh durch weitere Lichtquellen im Hintergrund des Sets.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea11.png" alt="Still 11" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 11 / 17 · Szene 13 — Konferenzraum</span>
+        <p class="gallery-caption">Manager trinkt aus rotem Glas. Laptop-Display als frontales Licht.</p>
+        <p class="gallery-cine">Deckenlichter abgedunkelt, Tageslicht mit <strong>Flags</strong> kontrolliert. Neu beleuchtet mit <strong>Amaran 300c</strong> und <strong>Smallrig 120d</strong>. Der Tee im Glas: mit <strong>Lebensmittelfarbe</strong> eingefärbt. Bewusst keine dramatische Geste — der Shot sieht aus wie Büroalltag, das Rot ist das einzige Signal.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea12.png" alt="Still 12" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 12 / 17 · Szene 9 — Labor</span>
+        <p class="gallery-caption">Ensemble-Shot. Grünes LED-Unterlicht durch Milchglasscheibe auf dem Boden.</p>
+        <p class="gallery-cine"><strong>Amaran 300c</strong> mit grüner Farbeinstellung, dazu ein Spiegel und das <strong>Notausgangsschild</strong> des Sets als zusätzlicher grüner Lichtgeber. Kamera leicht unter Augenhöhe. Einziger Ensemble-Shot des Films — deshalb maximale Dunkelheit, ein Licht von unten.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea13.png" alt="Still 13" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 13 / 17 · Szene 9 — Labor</span>
+        <p class="gallery-caption">Wissenschaftler hält Ampulle ins Licht. Gruppe auf offener Blende weggezoomt.</p>
+        <p class="gallery-cine"><strong>Amaran 300c</strong> und <strong>Notausgangsschild</strong> des Sets als grüne Lichtquellen. Fokus auf die Ampulle, nicht das Gesicht — das Objekt ist in dieser Szene wichtiger als der Mensch. Die Flüssigkeit in der Ampulle: mit Lebensmittelfarbe eingefärbt. Die Gruppe bildet Tiefe ohne abzulenken.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea14.png" alt="Still 14" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 14 / 17 · Szene 9 — Labor</span>
+        <p class="gallery-caption">Makro: Roter Tropfen auf Glasobjektträger. Blaues und violettes Gel-Panel von beiden Seiten.</p>
+        <p class="gallery-cine">Standardlampen als Lichtquelle, Kamera direkt über dem Objektträger. Die Flüssigkeit: mit <strong>Lebensmittelfarbe</strong> eingefärbt — wie alle Flüssigkeiten im gesamten Film. Minimale Tiefenschärfe: nur der Tropfen ist scharf.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea15.png" alt="Still 15" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 15 / 17 · Szene 10 — Hitze-Experiment</span>
+        <p class="gallery-caption">Wissenschaftlerin mit brennender Schale. Fensterblenden geschlossen, Teal-LED-Panel von rechts.</p>
+        <p class="gallery-cine">Deckenlichter abgedunkelt, Tageslicht über <strong>Flags</strong> halbkontrolliert hereingelassen. Feuer der Schale als Practical Light, neu beleuchtet mit <strong>Amaran 300c</strong> und <strong>Smallrig 120d</strong>. Medium-Shot statt Close-Up, damit das Labor als Raum im Bild bleibt.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea16.png" alt="Still 16" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 16 / 17 · Szene 1 — Fremder Planet</span>
+        <p class="gallery-caption">Rover-Modell (~40 cm) in Kunstnebel. Rotes Gel-Licht, Kamera bodennah.</p>
+        <p class="gallery-cine">Nachts draußen gedreht. Rover selbstgebaut aus einer alten Bürolampe, Holz, ausrangierter Technik, Kabeln, <strong>Alufolie</strong>, Luftentfeuchter und Klorollen — gezogen an <strong>durchsichtigen Schnüren</strong>. Die Erhöhungen im Vordergrund: <strong>echter Schnee</strong>. Nebelmaschine für Atmosphärennebel. <strong>Amaran 300c</strong> mit roter Farbeinstellung. Kamera auf dem Boden — Modell wirkt dadurch größer. Kein VFX.</p>
+      </div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-img"><img src="Projekte/Berry Tea/berrytea17.png" alt="Still 17" /></div>
+      <div class="gallery-overlay">
+        <span class="gallery-img-num">STILL 17 / 17 · Szene 7 — Fremder Planet</span>
+        <p class="gallery-caption">Rover-Abflug: vier Wunderkerzen als Pyrotechnik, Nebelmaschine, rotes Dauerlicht.</p>
+        <p class="gallery-cine">Nachts draußen gedreht. <strong>Silvester-Feuerwerkskörper</strong> als Pyrotechnik, Nebelmaschine auf Dauerbetrieb, <strong>Amaran 300c</strong> mit knalligem Rot. Der Rover an durchsichtigen Schnüren gezogen, die Landschaft aus <strong>echtem Schnee</strong> aufgebaut. Kamera bodennah — alles in einem Take koordiniert.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div class="project-footer">
+    <a href="index.html" class="footer-back">← Zurück zur Übersicht</a>
+    <a href="index.html#contact" class="footer-next">
+      <p class="footer-next-label">Kontakt</p>
+      <p class="footer-next-title">Zusammen­arbeit anfragen <em>→</em></p>
+    </a>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">Schließen ✕</button>
+    <img id="lightboxImg" src="" alt="" />
+    <p class="lightbox-caption" id="lightboxCaption"></p>
+  </div>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let ringX = 0, ringY = 0, curX = 0, curY = 0;
+    document.addEventListener('mousemove', e => {
+      curX = e.clientX; curY = e.clientY;
+      cursor.style.left = curX + 'px'; cursor.style.top = curY + 'px';
+    });
+    function animateRing() {
+      ringX += (curX - ringX) * 0.12; ringY += (curY - ringY) * 0.12;
+      ring.style.left = ringX + 'px'; ring.style.top = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    // Lightbox
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+
+    document.querySelectorAll('.gallery-img').forEach(el => {
+      el.addEventListener('click', () => {
+        const img = el.querySelector('img');
+        const caption = el.closest('.gallery-item').querySelector('.gallery-caption').textContent;
+        lightboxImg.src = img.src;
+        lightboxCaption.textContent = caption;
+        lightbox.classList.add('open');
+      });
+    });
+    document.getElementById('lightboxClose').addEventListener('click', () => lightbox.classList.remove('open'));
+    lightbox.addEventListener('click', e => { if(e.target === lightbox) lightbox.classList.remove('open'); });
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') lightbox.classList.remove('open'); });
+
+    // Scroll animations
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; } });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.gallery-item, .note-card').forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(32px)';
+      el.style.transition = 'opacity .7s, transform .7s';
+      obs.observe(el);
+    });
+  </script>
+</body>
+</html>

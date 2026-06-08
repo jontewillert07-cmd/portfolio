@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Impressum — Jonte Jesper Willert</title>
+  <link rel="icon" type="image/svg+xml" href="logo-animated.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Space+Mono:wght@400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #080808; --dark: #0e0e0e; --border: #222;
+      --gold: #c9a84c; --gold-dim: #8a6f2e; --white: #f0ece4; --grey: #888;
+    }
+    body { background: var(--black); color: var(--white); font-family: 'Space Mono', monospace; font-size: 13px; line-height: 1.8; cursor: none; }
+    .cursor { position: fixed; width: 6px; height: 6px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); }
+    .cursor-ring { position: fixed; width: 32px; height: 32px; border: 1px solid var(--gold-dim); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform .12s ease-out; }
+
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 24px 48px; border-bottom: 1px solid var(--border);
+    }
+    .nav-logo img { width: 52px; height: 52px; display: block; text-decoration: none; }
+    .nav-back {
+      font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--grey); text-decoration: none; transition: color .3s;
+    }
+    .nav-back:hover { color: var(--gold); }
+
+    main { max-width: 680px; margin: 0 auto; padding: 100px 48px; }
+
+    .page-label {
+      font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 48px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .page-label::before { content: ''; display: block; width: 32px; height: 1px; background: var(--gold-dim); }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 300;
+      line-height: 1; margin-bottom: 64px; color: var(--white);
+    }
+    h1 em { font-style: italic; color: var(--gold); }
+
+    h2 {
+      font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300;
+      color: var(--white); margin-top: 48px; margin-bottom: 16px;
+      padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    }
+
+    p { color: var(--grey); margin-bottom: 12px; }
+    a { color: var(--gold-dim); text-decoration: none; transition: color .3s; }
+    a:hover { color: var(--gold); }
+
+    .info-row { display: flex; gap: 24px; color: var(--grey); margin-bottom: 8px; }
+    .info-label { color: #555; min-width: 120px; }
+
+    footer {
+      border-top: 1px solid var(--border); padding: 24px 48px;
+      font-size: 10px; color: #444; text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <nav>
+    <a href="index.html" class="nav-logo"><img src="logo-animated.svg" alt="JJW"/></a>
+    <a href="index.html" class="nav-back">← Zurück</a>
+  </nav>
+
+  <main>
+    <p class="page-label">Rechtliches</p>
+    <h1>Impressum<br><em>§ 5 TMG</em></h1>
+
+    <h2>Angaben gemäß § 5 TMG</h2>
+    <div class="info-row"><span class="info-label">Name</span><span>Jonte Jesper Willert</span></div>
+    <div class="info-row"><span class="info-label">Adresse</span><span>Altenholz, Schleswig-Holstein, Deutschland</span></div>
+    <div class="info-row"><span class="info-label">E-Mail</span><span><a href="mailto:jonte.willert07@gmail.com">jonte.willert07@gmail.com</a></span></div>
+
+    <h2>Verantwortlich für den Inhalt</h2>
+    <p>Jonte Jesper Willert (Anschrift wie oben)</p>
+
+    <h2>Haftungsausschluss</h2>
+    <p>Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte wird keine Gewähr übernommen.</p>
+    <p>Als Diensteanbieter bin ich gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG bin ich als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen.</p>
+
+    <h2>Urheberrecht</h2>
+    <p>Die durch den Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.</p>
+
+    <h2>Bildrechte</h2>
+    <p>Alle auf dieser Website verwendeten Fotos und Filmstills: © Jonte Jesper Willert. Alle Rechte vorbehalten.</p>
+  </main>
+
+  <footer>© 2026 Jonte Jesper Willert</footer>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let rx = 0, ry = 0, cx = 0, cy = 0;
+    document.addEventListener('mousemove', e => { cx = e.clientX; cy = e.clientY; cursor.style.left = cx+'px'; cursor.style.top = cy+'px'; });
+    function anim() { rx += (cx-rx)*.12; ry += (cy-ry)*.12; ring.style.left = rx+'px'; ring.style.top = ry+'px'; requestAnimationFrame(anim); }
+    anim();
+  </script>
+</body>
+</html>
